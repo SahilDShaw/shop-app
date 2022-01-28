@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/providers/cart.dart';
-import 'package:shop_app/providers/product.dart';
-import 'package:shop_app/screens/product_detail_screen.dart';
+
+import '../screens/product_detail_screen.dart';
+import '../providers/product.dart';
+import '../providers/cart.dart';
 
 class ProductItem extends StatelessWidget {
   // final String id;
@@ -15,7 +16,6 @@ class ProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
-    print('Product rebuilds!');
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -33,39 +33,34 @@ class ProductItem extends StatelessWidget {
         ),
         footer: GridTileBar(
           backgroundColor: Colors.black87,
-          // Consumer listens to the provider as well
-          // it helps to wrap only those widgets which we need to listen
-          // Consumer always listens
           leading: Consumer<Product>(
-            builder: (ctx, product, child) => IconButton(
-              onPressed: () {
-                product.toggleFavoriteStatus();
-              },
-              icon: Icon(
-                product.isFavorite ? Icons.favorite : Icons.favorite_border,
-              ),
-              color: Theme.of(context).accentColor,
-            ),
-            // this child is taken as the argument in the builder above
-            // child: Text('Never Changes!'),
+            builder: (ctx, product, _) => IconButton(
+                  icon: Icon(
+                    product.isFavorite ? Icons.favorite : Icons.favorite_border,
+                  ),
+                  color: Theme.of(context).accentColor,
+                  onPressed: () {
+                    product.toggleFavoriteStatus();
+                  },
+                ),
           ),
           title: Text(
             product.title,
             textAlign: TextAlign.center,
           ),
           trailing: IconButton(
+            icon: Icon(
+              Icons.shopping_cart,
+            ),
             onPressed: () {
               cart.addItem(product.id, product.price, product.title);
-              // Scaffold.of(context) establishes a connection between the nearest scaffold
-              // Scaffold.of(context).openDrawer(); -> opens the drawer
-              // in the nearest Scaffold(if it has a drawer)
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(
+              Scaffold.of(context).hideCurrentSnackBar();
+              Scaffold.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text(
+                  content: Text(
                     'Added item to cart!',
                   ),
-                  duration: const Duration(seconds: 2),
+                  duration: Duration(seconds: 2),
                   action: SnackBarAction(
                     label: 'UNDO',
                     onPressed: () {
@@ -75,10 +70,7 @@ class ProductItem extends StatelessWidget {
                 ),
               );
             },
-            icon: Icon(
-              Icons.shopping_cart,
-              color: Theme.of(context).accentColor,
-            ),
+            color: Theme.of(context).accentColor,
           ),
         ),
       ),
